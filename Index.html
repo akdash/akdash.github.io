@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anil Kumar Dash — Product Security Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+:root {
+  --bg: #0a0a0b;
+  --surface: #111114;
+  --surface2: #18181c;
+  --border: #222228;
+  --accent: #00e5a0;
+  --accent-dim: rgba(0,229,160,0.12);
+  --accent-glow: rgba(0,229,160,0.25);
+  --text: #e8e8ee;
+  --muted: #6b6b7a;
+  --mid: #9999aa;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: rgba(10,10,11,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--accent); }
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 140px 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--border);
+  opacity: 0.5;
+}
+.hero-grid-line:nth-child(1) { left: 20%; }
+.hero-grid-line:nth-child(2) { left: 40%; }
+.hero-grid-line:nth-child(3) { left: 60%; }
+.hero-grid-line:nth-child(4) { left: 80%; }
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 900px; }
+
+.hero-tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 4px 14px;
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.2s forwards;
+}
+
+.hero-name {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.7s ease 0.4s forwards;
+}
+
+.hero-name span { color: var(--accent); }
+
+.hero-title {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: clamp(18px, 3vw, 28px);
+  color: var(--mid);
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.7s ease 0.55s forwards;
+}
+
+.hero-desc {
+  max-width: 580px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.7s ease 0.7s forwards;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.7s ease 0.85s forwards;
+}
+
+.btn {
+  padding: 12px 28px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  font-weight: 500;
+}
+.btn-primary:hover { background: #00ffb3; transform: translateY(-2px); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.btn-outline:hover { background: var(--accent-dim); transform: translateY(-2px); }
+
+.hero-stats {
+  position: absolute;
+  right: 60px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.2s forwards;
+}
+
+.stat {
+  text-align: right;
+  border-right: 2px solid var(--accent);
+  padding-right: 20px;
+}
+
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* SECTION BASE */
+section {
+  padding: 100px 60px;
+  border-top: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 60px;
+  line-height: 1;
+}
+
+/* ABOUT */
+#about .about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.about-text p {
+  color: var(--mid);
+  font-size: 14px;
+  line-height: 2;
+  margin-bottom: 20px;
+}
+
+.about-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.meta-item {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s;
+}
+.meta-item:hover { border-color: var(--accent); }
+
+.meta-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.meta-key {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.meta-val {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.meta-val a { color: var(--accent); text-decoration: none; }
+.meta-val a:hover { text-decoration: underline; }
+
+/* SKILLS */
+#skills { background: var(--surface); }
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2px;
+}
+
+.skill-card {
+  background: var(--bg);
+  padding: 36px 32px;
+  border: 1px solid var(--border);
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+
+.skill-card:hover::before { transform: scaleX(1); }
+.skill-card:hover { background: var(--surface2); }
+
+.skill-card-icon {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.skill-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  color: var(--mid);
+  transition: all 0.2s;
+}
+.tag:hover { border-color: var(--accent); color: var(--accent); }
+
+/* EXPERIENCE */
+.timeline { position: relative; }
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 48px;
+  padding-bottom: 60px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 6px;
+  width: 11px; height: 11px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.timeline-period {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.timeline-company {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.timeline-role {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--mid);
+  margin-bottom: 20px;
+}
+
+.timeline-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-points li {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  padding-left: 16px;
+  position: relative;
+}
+
+.timeline-points li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* HONORS */
+#honors { background: var(--surface); }
+
+.honors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2px;
+}
+
+.honor-card {
+  background: var(--bg);
+  padding: 32px 28px;
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all 0.2s;
+}
+.honor-card:hover { border-color: var(--accent); }
+
+.honor-badge {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.honor-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.honor-org {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.honor-date {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* EDUCATION */
+.edu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.edu-card {
+  border: 1px solid var(--border);
+  padding: 32px;
+  background: var(--surface);
+  transition: border-color 0.2s;
+}
+.edu-card:hover { border-color: var(--accent); }
+
+.edu-degree {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.edu-school {
+  color: var(--mid);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.edu-year {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* CONTACT */
+#contact {
+  background: var(--bg);
+  text-align: center;
+  padding: 120px 60px;
+}
+
+.contact-tagline {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: clamp(20px, 3vw, 32px);
+  color: var(--mid);
+  margin-bottom: 48px;
+}
+
+.contact-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 60px;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border: 1px solid var(--border);
+  color: var(--mid);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  background: var(--surface);
+}
+.contact-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.contact-link .icon { font-size: 18px; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer p { font-size: 11px; color: var(--muted); }
+footer span { color: var(--accent); }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  section { padding: 70px 24px; }
+  #hero { padding: 120px 24px 80px; }
+  .hero-stats { display: none; }
+  #about .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .edu-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 8px; text-align: center; }
+}
+```
+
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+
+  <nav>
+    <a class="nav-logo" href="#">AKD</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#honors">Honors</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+
+  <section id="hero">
+    <div class="hero-grid-line"></div>
+    <div class="hero-grid-line"></div>
+    <div class="hero-grid-line"></div>
+    <div class="hero-grid-line"></div>
+    <div class="hero-glow"></div>
+
+```
+<div class="hero-content">
+  <div class="hero-tag">Product Security Engineer</div>
+  <h1 class="hero-name">Anil<br/>Kumar <span>Dash</span></h1>
+  <p class="hero-title">Building & Protecting Products from Design to Deployment</p>
+  <p class="hero-desc">
+    Product Security Architect with 13+ years of experience designing and managing robust security
+    solutions. Expertise in SSDLC, threat modelling, vulnerability management, and secure CI/CD pipelines.
+  </p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn btn-primary">Get in Touch</a>
+    <a href="#experience" class="btn btn-outline">View Experience</a>
+  </div>
+</div>
+
+<div class="hero-stats">
+  <div class="stat">
+    <div class="stat-num">13+</div>
+    <div class="stat-label">Years Experience</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4</div>
+    <div class="stat-label">Companies</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">3×</div>
+    <div class="stat-label">Award Winner</div>
+  </div>
+</div>
+```
+
+  </section>
+
+  <!-- ABOUT -->
+
+  <section id="about">
+    <div class="section-label">01 / About</div>
+    <h2 class="section-title reveal">Who I Am</h2>
+
+```
+<div class="about-grid reveal">
+  <div class="about-text">
+    <p>
+      I'm a Product Security Architect passionate about embedding security at every layer of the software
+      development lifecycle — from threat modelling in design phases to hardening CI/CD pipelines in production.
+    </p>
+    <p>
+      With over 13 years in the industry, I've worked across product security, software architecture, and
+      secure code review, helping organizations at Wipro and Trellix (formerly McAfee) ship resilient, secure products.
+    </p>
+    <p>
+      I believe security isn't a gate — it's a culture. My work focuses on shifting security left, empowering
+      engineering teams, and building systems that are secure by design.
+    </p>
+  </div>
+
+  <div class="about-meta">
+    <div class="meta-item">
+      <div class="meta-icon">📍</div>
+      <div>
+        <div class="meta-key">Location</div>
+        <div class="meta-val">HSR Layout, Bangalore — 560102</div>
+      </div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-icon">📧</div>
+      <div>
+        <div class="meta-key">Email</div>
+        <div class="meta-val"><a href="mailto:dashanilk@gmail.com">dashanilk@gmail.com</a></div>
+      </div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-icon">🔗</div>
+      <div>
+        <div class="meta-key">LinkedIn</div>
+        <div class="meta-val"><a href="https://www.linkedin.com/in/anil-kumar-dash/" target="_blank">linkedin.com/in/anil-kumar-dash</a></div>
+      </div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-icon">🌐</div>
+      <div>
+        <div class="meta-key">Languages</div>
+        <div class="meta-val">English · Hindi · Odia</div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+  </section>
+
+  <!-- SKILLS -->
+
+  <section id="skills">
+    <div class="section-label">02 / Skills</div>
+    <h2 class="section-title reveal">Core Expertise</h2>
+
+```
+<div class="skills-grid reveal">
+  <div class="skill-card">
+    <div class="skill-card-icon">🛡️</div>
+    <div class="skill-card-title">Security Methodologies</div>
+    <div class="skill-tags">
+      <span class="tag">SSDLC</span>
+      <span class="tag">Threat Modelling</span>
+      <span class="tag">Secure Design Review</span>
+      <span class="tag">Secure Code Review</span>
+      <span class="tag">Risk Assessment</span>
+      <span class="tag">Vulnerability Management</span>
+      <span class="tag">Compliance</span>
+    </div>
+  </div>
+
+  <div class="skill-card">
+    <div class="skill-card-icon">🔧</div>
+    <div class="skill-card-title">Security Tools</div>
+    <div class="skill-tags">
+      <span class="tag">Burp Suite</span>
+      <span class="tag">Nessus</span>
+      <span class="tag">Rapid7</span>
+      <span class="tag">Nexpose</span>
+      <span class="tag">Netsparker</span>
+      <span class="tag">OWASP ZAP</span>
+      <span class="tag">Blackduck Scanner</span>
+      <span class="tag">Cave</span>
+    </div>
+  </div>
+
+  <div class="skill-card">
+    <div class="skill-card-icon">🔍</div>
+    <div class="skill-card-title">Testing & Analysis</div>
+    <div class="skill-tags">
+      <span class="tag">SAST</span>
+      <span class="tag">DAST</span>
+      <span class="tag">Fuzzing</span>
+      <span class="tag">Penetration Testing</span>
+      <span class="tag">CVE Analysis</span>
+      <span class="tag">PSIRT Validation</span>
+    </div>
+  </div>
+
+  <div class="skill-card">
+    <div class="skill-card-icon">⚙️</div>
+    <div class="skill-card-title">DevSecOps & Infra</div>
+    <div class="skill-tags">
+      <span class="tag">Build Environment Security</span>
+      <span class="tag">CI/CD Security</span>
+      <span class="tag">Artifact Repositories</span>
+      <span class="tag">Version Control</span>
+      <span class="tag">GIT</span>
+      <span class="tag">JIRA</span>
+    </div>
+  </div>
+</div>
+```
+
+  </section>
+
+  <!-- EXPERIENCE -->
+
+  <section id="experience">
+    <div class="section-label">03 / Experience</div>
+    <h2 class="section-title reveal">Career Timeline</h2>
+
+```
+<div class="timeline reveal">
+
+  <div class="timeline-item">
+    <div class="timeline-period">May 2021 – Present</div>
+    <div class="timeline-company">Wipro</div>
+    <div class="timeline-role">Security Architect</div>
+    <ul class="timeline-points">
+      <li>Lead Secure Architecture/Design Reviews and Threat Modeling, proactively identifying and mitigating security risks at early stages.</li>
+      <li>Conduct comprehensive Security Code Reviews, Vulnerability Assessments, and Remediation management using SAST/DAST.</li>
+      <li>Operate security tools including Blackduck Scanner, Nessus, Rapid7, Nexpose, Netsparker, ZAP, and Burp for fuzzing and penetration testing.</li>
+      <li>Implemented and maintained robust security measures within build environments — protecting source code, build artifacts, and deployment pipelines.</li>
+      <li>Developed and enforced security policies across CI/CD tools, version control systems, and artifact repositories.</li>
+      <li>Validate PSIRT cases and provide expert remediation guidance; evaluate diverse CVEs for impact analysis and prioritization.</li>
+    </ul>
+  </div>
+
+  <div class="timeline-item">
+    <div class="timeline-period">Jan 2016 – May 2021</div>
+    <div class="timeline-company">McAfee India (Now Trellix)</div>
+    <div class="timeline-role">Software Development Engineer & Security Architect</div>
+    <ul class="timeline-points">
+      <li>Fulfilled a multi-dimensional role as Development Engineer and Software Security Architect within the R&D Data Center Team.</li>
+      <li>Executed full SDLC processes — from analysis and design through coding, testing, deployment, and maintenance.</li>
+      <li>Performed Secure Architecture/Design Reviews and Threat Modeling for software applications.</li>
+      <li>Conducted Security Code Reviews and Vulnerability Assessments using Blackduck, Nessus, ZAP, and Burp.</li>
+      <li>Led a team of engineers in developing new software applications; collaborated with PMs to define scope and features.</li>
+    </ul>
+  </div>
+
+  <div class="timeline-item">
+    <div class="timeline-period">Nov 2014 – Dec 2015</div>
+    <div class="timeline-company">Manthan System (Now Algonomy)</div>
+    <div class="timeline-role">Software Engineer</div>
+    <ul class="timeline-points">
+      <li>Designed models and ER diagrams based on KPI metadata for Retail BI product.</li>
+      <li>Contributed to R&D team developing management tools and data-level security privileges.</li>
+      <li>Participated in UX/UI evaluation team focused on revamped interface and usability.</li>
+      <li>Led a team of software engineers in the development of a new product line.</li>
+    </ul>
+  </div>
+
+  <div class="timeline-item" style="padding-bottom: 0;">
+    <div class="timeline-period">Feb 2012 – Nov 2014</div>
+    <div class="timeline-company">People10 Technosoft</div>
+    <div class="timeline-role">Software Engineer</div>
+    <ul class="timeline-points">
+      <li>Developed innovative software solutions for complex engineering problems.</li>
+      <li>Authored maintainable, scalable code with comprehensive unit and integration tests.</li>
+      <li>Participated in UAT and production deployments; conducted thorough code reviews.</li>
+    </ul>
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- HONORS -->
+
+  <section id="honors">
+    <div class="section-label">04 / Recognition</div>
+    <h2 class="section-title reveal">Honors & Awards</h2>
+
+```
+<div class="honors-grid reveal">
+  <div class="honor-card">
+    <div class="honor-badge">🏆</div>
+    <div class="honor-title">Best Employee of the Quarter</div>
+    <div class="honor-org">McAfee India Pvt. Ltd.</div>
+    <div class="honor-date">Q4 2018</div>
+  </div>
+  <div class="honor-card">
+    <div class="honor-badge">🥇</div>
+    <div class="honor-title">Best Employee of the Quarter</div>
+    <div class="honor-org">McAfee India Pvt. Ltd.</div>
+    <div class="honor-date">Q2 2017</div>
+  </div>
+  <div class="honor-card">
+    <div class="honor-badge">⭐</div>
+    <div class="honor-title">Best Trainee Engineer</div>
+    <div class="honor-org">People10 Technosoft Pvt. Ltd.</div>
+    <div class="honor-date">September 2012</div>
+  </div>
+</div>
+```
+
+  </section>
+
+  <!-- EDUCATION -->
+
+  <section id="education">
+    <div class="section-label">05 / Education</div>
+    <h2 class="section-title reveal">Academic Background</h2>
+
+```
+<div class="edu-grid reveal">
+  <div class="edu-card">
+    <div class="edu-degree">Master of Computer Applications</div>
+    <div class="edu-school">Khallikote Autonomous College</div>
+    <div class="edu-year">2008 – 2011</div>
+  </div>
+  <div class="edu-card">
+    <div class="edu-degree">Bachelor of Science</div>
+    <div class="edu-school">Utkal University</div>
+    <div class="edu-year">2005 – 2008</div>
+  </div>
+</div>
+```
+
+  </section>
+
+  <!-- CONTACT -->
+
+  <section id="contact">
+    <div class="section-label">06 / Contact</div>
+    <h2 class="section-title reveal">Let's Connect</h2>
+    <p class="contact-tagline reveal">Open to security leadership roles, consulting, and collaborations.</p>
+
+```
+<div class="contact-links reveal">
+  <a href="mailto:dashanilk@gmail.com" class="contact-link">
+    <span class="icon">✉️</span> dashanilk@gmail.com
+  </a>
+  <a href="https://www.linkedin.com/in/anil-kumar-dash/" target="_blank" class="contact-link">
+    <span class="icon">🔗</span> LinkedIn Profile
+  </a>
+  <a href="tel:+917204149154" class="contact-link">
+    <span class="icon">📞</span> +91 7204149154
+  </a>
+</div>
+```
+
+  </section>
+
+  <!-- FOOTER -->
+
+  <footer>
+    <p>© 2025 <span>Anil Kumar Dash</span> — Product Security Engineer</p>
+    <p>Bangalore, India</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
